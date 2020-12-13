@@ -1,55 +1,73 @@
-import Axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import Article from '../article/article';
+import Axios from "axios";
+import React, { useEffect, useState } from "react";
+import Article from "../article/article";
 
-import './container.css';
+import "./container.css";
 
-export default function Container(){
+export default function Container() {
+	const [articles, setArticles] = useState([]);
 
-  const [articles, setArticles] = useState([])
-  // const [deleted, setDeleted] = useState([])
+	const getArticles = async () => {
+		const { data } = await Axios.get("http://localhost:3001/articles");
+		const articles = data.articles;
+		const filtered = filterArticles(articles);
+		setArticles(filtered);
+	};
 
-  const getArticles = async () => {
-    const {data} = await Axios.get('http://localhost:3001/articles')
-    setArticles(data.articles)
-  } 
-
-  const deleteArticle = (id) => {      
-    const deleted = JSON.parse(localStorage.getItem('deleted'))
-    if(!deleted){
-      let item = [].concat(id)        
-      localStorage.setItem('deleted', JSON.stringify(item))    
-    }else {
-      let item = [].concat(deleted);
-      item.push(id)
-      localStorage.setItem('deleted', JSON.stringify(item))
-    }  
+	const addException = (id) => {
+		const deleted = JSON.parse(localStorage.getItem("deleted"));
+		if (!deleted) {
+			let item = [].concat(id);
+			localStorage.setItem("deleted", JSON.stringify(item));
+		} else {
+			let item = [].concat(deleted);
+			item.push(id);
+			localStorage.setItem("deleted", JSON.stringify(item));
+		}
   };
+  
+  // const addExceptionObj = (id) => {
+	// 	const deleted = JSON.parse(localStorage.getItem("deleted"));
+	// 	if (!deleted) {
+	// 		let item = {id}
+	// 		localStorage.setItem("deleted", JSON.stringify(item));
+	// 	} else {
+	// 		let item = [].concat(deleted);
+	// 		item.push(id);
+	// 		localStorage.setItem("deleted", JSON.stringify(item));
+	// 	}
+	// };
 
-  const filterArticles = () => {    
-    if(!localStorage.getItem('deleted')) return; 
-    
-    let deleted = [].concat(JSON.parse(localStorage.getItem('deleted')));
-      
-    deleted.forEach(el => {                   
-      setArticles(articles.filter((a) => a.articleID !== el.toString()))
-    });
-  };
+	const deleteArticle = async (id) => {
+    addException(id);
+    // addExceptionObj(id)
+		getArticles();
+	};
 
-  useEffect(() => {
-    getArticles();
-    filterArticles();
-  }, [])
+	const filterArticles = (data) => {
+		if (localStorage.getItem("deleted")) {
+			let deleted = [].concat(JSON.parse(localStorage.getItem("deleted")));
 
-  return (
-    <div className='container'>
-      {articles[0] && articles.map((a, i) => 
-        <Article 
-          key={a.articleID} 
-          article={a} 
-          deleteArticle={deleteArticle}
-          />
-      )}
-    </div>
-  )
+			let filtered = data;
+			deleted.forEach((el) => {
+				filtered = filtered.filter((a) => a.articleID.toString() !== el.toString());
+			});
+			return filtered;
+		} else {
+			return data;
+		}
+	};
+
+	useEffect(() => {
+		getArticles();
+	}, []);
+
+	return (
+		<div className="container">
+			{articles[0] &&
+				articles.map((a, i) => (
+					<Article key={a.articleID} article={a} deleteArticle={deleteArticle} />
+				))}
+		</div>
+	);
 }
