@@ -8,7 +8,7 @@ export default function Container() {
 	const [articles, setArticles] = useState([]);
 
 	const getArticles = async () => {
-		const { data } = await Axios.get("http://localhost:3001/articles");
+		const { data } = await Axios.get("http://localhost:5001/articles");
 		const articles = data.articles;
     const filtered = filterArticles(articles);    
 		setArticles(filtered);
