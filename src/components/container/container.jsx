@@ -10,48 +10,32 @@ export default function Container() {
 	const getArticles = async () => {
 		const { data } = await Axios.get("http://localhost:3001/articles");
 		const articles = data.articles;
-		const filtered = filterArticles(articles);
+    const filtered = filterArticles(articles);    
 		setArticles(filtered);
 	};
 
-	const addException = (id) => {
+  const addException = (id) => {
 		const deleted = JSON.parse(localStorage.getItem("deleted"));
 		if (!deleted) {
-			let item = [].concat(id);
+			let item = {[id]: id}
 			localStorage.setItem("deleted", JSON.stringify(item));
 		} else {
-			let item = [].concat(deleted);
-			item.push(id);
-			localStorage.setItem("deleted", JSON.stringify(item));
+      deleted[id] = id
+			localStorage.setItem("deleted", JSON.stringify(deleted));      
 		}
-  };
-  
-  // const addExceptionObj = (id) => {
-	// 	const deleted = JSON.parse(localStorage.getItem("deleted"));
-	// 	if (!deleted) {
-	// 		let item = {id}
-	// 		localStorage.setItem("deleted", JSON.stringify(item));
-	// 	} else {
-	// 		let item = [].concat(deleted);
-	// 		item.push(id);
-	// 		localStorage.setItem("deleted", JSON.stringify(item));
-	// 	}
-	// };
-
-	const deleteArticle = async (id) => {
-    addException(id);
-    // addExceptionObj(id)
-		getArticles();
 	};
 
-	const filterArticles = (data) => {
+	const deleteArticle = async (id) => {
+    addException(id)
+		getArticles();
+	};
+  
+  const filterArticles = (data) => {
 		if (localStorage.getItem("deleted")) {
-			let deleted = [].concat(JSON.parse(localStorage.getItem("deleted")));
-
-			let filtered = data;
-			deleted.forEach((el) => {
-				filtered = filtered.filter((a) => a.articleID.toString() !== el.toString());
-			});
+      let deleted = JSON.parse(localStorage.getItem("deleted"));
+      				
+			let filtered = data.filter((a) => !deleted[a.articleID]);
+			
 			return filtered;
 		} else {
 			return data;
