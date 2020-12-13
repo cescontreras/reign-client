@@ -15,6 +15,10 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+} 
+
+.main-data:hover {
+  cursor: pointer;
 }
 
 .article:hover {
@@ -24,12 +28,11 @@
 
 .article-title {
   font-size: 13pt;
-  color: #333;
+  color: #333; 
 }
 
 .article-author {
-  color: #999;
-  
+  color: #999;  
 }
 
 .article-date {
@@ -51,4 +54,9 @@ img {
 
 img:hover {
   cursor: pointer;
+}
+
+a {
+  color: #333;  
+  text-decoration: none;
 }
